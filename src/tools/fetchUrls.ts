@@ -1,4 +1,4 @@
-import { Browser, Page } from "playwright";
+import { Browser, Page } from "patchright";
 import { WebContentProcessor } from "../services/webContentProcessor.js";
 import { BrowserService } from "../services/browserService.js";
 import { FetchOptions, FetchResult } from "../types/index.js";

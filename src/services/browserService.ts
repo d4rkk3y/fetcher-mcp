@@ -1,4 +1,4 @@
-import { Browser, BrowserContext, Page, chromium } from "playwright";
+import { Browser, BrowserContext, Page, chromium } from "patchright";
 import { logger } from "../utils/logger.js";
 import { FetchOptions } from "../types/index.js";
 
