@@ -34,9 +34,3 @@ RUN npm ci --only=production
 
 # Install Playwright browsers (ensure headless shell is installed)
 RUN npx playwright install --with-deps chromium
-
-# Expose port
-EXPOSE 3000
-
-# Startup command
-CMD ["node", "build/index.js", "--log", "--transport=http", "--host=0.0.0.0", "--port=3000"] 
