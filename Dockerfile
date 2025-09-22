@@ -34,7 +34,7 @@ RUN npm ci --only=production
 
 RUN mkdir -p /app/.cache/uv
 ENV XDG_CACHE_HOME="/app/.cache"
-RUN npx playwright install --with-deps chromium
+RUN npx patchright install --with-deps chromium
 
 RUN curl -fsSL https://bun.sh/install | bash
 ENV BUN_INSTALL="/home/mcp/.bun"
