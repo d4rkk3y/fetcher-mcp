@@ -33,7 +33,7 @@ export const fetchUrlsTool = {
       extractContent: {
         type: "boolean",
         description:
-          "Whether to intelligently extract the main content, default is false",
+          "Whether to intelligently extract the main content, default is true",
       },
       maxLength: {
         type: "number",
@@ -86,7 +86,7 @@ export async function fetchUrls(args: any) {
       | "domcontentloaded"
       | "networkidle"
       | "commit",
-    extractContent: args?.extractContent === true,
+    extractContent: args?.extractContent !== false,
     maxLength: Number(args?.maxLength) || 0,
     returnHtml: args?.returnHtml === true,
     waitForNavigation: args?.waitForNavigation === true,
