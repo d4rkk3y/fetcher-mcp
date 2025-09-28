@@ -1,5 +1,5 @@
 import { JSDOM } from "jsdom";
-import { Readability } from "@mozilla/readability";
+import { Defuddle } from 'defuddle/node';
 import TurndownService from "turndown";
 import { FetchOptions, FetchResult } from "../types/index.js";
 import { logger } from "../utils/logger.js";
@@ -211,8 +211,9 @@ export class WebContentProcessor {
     if (this.options.extractContent) {
       logger.info(`${this.logPrefix} Extracting main content`);
       const dom = new JSDOM(html, { url });
-      const reader = new Readability(dom.window.document);
-      const article = reader.parse();
+      const article = await Defuddle(html, url, {
+        removeImages: true
+      });
 
       if (!article) {
         logger.warn(
