@@ -7,8 +7,8 @@
  */
 
 import { getConfig, isDebugMode } from "./config/index.js";
-import { createTransportProvider } from "./transports/index.js";
 import { startServer } from "./server.js";
+import { createTransportProvider } from "./transports/index.js";
 import { logger } from "./utils/logger.js";
 
 /**
@@ -18,9 +18,7 @@ async function main() {
   logger.info("[Setup] Initializing browser MCP server...");
 
   if (isDebugMode()) {
-    logger.warn(
-      "[Setup] Debug mode enabled, Chrome browser window will be visible"
-    );
+    logger.warn("[Setup] Debug mode enabled, Chrome browser window will be visible");
   }
 
   try {
@@ -40,12 +38,10 @@ async function main() {
       logger.info(
         `[Setup] HTTP server running at http://${
           config.transport.host || "localhost"
-        }:${config.transport.port || 3000}`
+        }:${config.transport.port || 3000}`,
       );
       logger.info("[Setup] Available endpoints:");
-      logger.info(
-        "[Setup] - /mcp - Streamable HTTP endpoint (modern MCP protocol)"
-      );
+      logger.info("[Setup] - /mcp - Streamable HTTP endpoint (modern MCP protocol)");
       logger.info("[Setup] - /sse - SSE endpoint (legacy MCP protocol)");
     } else {
       logger.info("[Setup] Using standard input/output (stdio) transport");

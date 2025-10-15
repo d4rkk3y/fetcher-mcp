@@ -1,7 +1,7 @@
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import type { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { TransportProvider } from "./types.js";
 import { logger } from "../utils/logger.js";
+import type { TransportProvider } from "./types.js";
 
 /**
  * Stdio Transport Provider implementation

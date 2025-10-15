@@ -1,7 +1,7 @@
-import { Browser, Page } from "patchright";
-import { WebContentProcessor } from "../services/webContentProcessor.js";
+import type { Browser, Page } from "patchright";
 import { BrowserService } from "../services/browserService.js";
-import { FetchOptions } from "../types/index.js";
+import { WebContentProcessor } from "../services/webContentProcessor.js";
+import type { FetchOptions } from "../types/index.js";
 import { logger } from "../utils/logger.js";
 
 /**
@@ -15,12 +15,12 @@ export const fetchUrlTool = {
     properties: {
       url: {
         type: "string",
-        description: "URL to fetch. Make sure to include the schema (http:// or https:// if not defined, preferring https for most cases)",
+        description:
+          "URL to fetch. Make sure to include the schema (http:// or https:// if not defined, preferring https for most cases)",
       },
       timeout: {
         type: "number",
-        description:
-          "Page loading timeout in milliseconds, default is 30000 (30 seconds)",
+        description: "Page loading timeout in milliseconds, default is 30000 (30 seconds)",
       },
       waitUntil: {
         type: "string",
@@ -29,18 +29,15 @@ export const fetchUrlTool = {
       },
       extractContent: {
         type: "boolean",
-        description:
-          "Whether to intelligently extract the main content, default is true",
+        description: "Whether to intelligently extract the main content, default is true",
       },
       maxLength: {
         type: "number",
-        description:
-          "Maximum length of returned content (in characters), default is no limit",
+        description: "Maximum length of returned content (in characters), default is no limit",
       },
       returnHtml: {
         type: "boolean",
-        description:
-          "Whether to return HTML content instead of Markdown, default is false",
+        description: "Whether to return HTML content instead of Markdown, default is false",
       },
       waitForNavigation: {
         type: "boolean",
@@ -95,7 +92,7 @@ export async function fetchUrl(args: any) {
 
   // Create browser service
   const browserService = new BrowserService(options);
-  
+
   // Create content processor
   const processor = new WebContentProcessor(options, "[FetchURL]");
   let browser: Browser | null = null;
@@ -108,7 +105,7 @@ export async function fetchUrl(args: any) {
   try {
     // Create a stealth browser with anti-detection measures
     browser = await browserService.createBrowser();
-    
+
     // Create a stealth browser context
     const { context, viewport } = await browserService.createContext(browser);
 
@@ -124,7 +121,7 @@ export async function fetchUrl(args: any) {
   } finally {
     // Clean up resources
     await browserService.cleanup(browser, page);
-    
+
     if (browserService.isInDebugMode()) {
       logger.debug(`Browser and page kept open for debugging. URL: ${url}`);
     }

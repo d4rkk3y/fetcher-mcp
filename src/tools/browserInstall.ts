@@ -1,6 +1,6 @@
-import { spawn } from "child_process";
-import { createRequire } from "module";
-import { existsSync } from "fs";
+import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
+import { createRequire } from "node:module";
 import { logger } from "../utils/logger.js";
 
 // Create require for ES modules
@@ -11,23 +11,24 @@ const require = createRequire(import.meta.url);
  */
 export const browserInstallTool = {
   name: "browser_install",
-  description: "Install Playwright Chromium browser binary. Call this if you get an error about the browser not being installed.",
+  description:
+    "Install Playwright Chromium browser binary. Call this if you get an error about the browser not being installed.",
   inputSchema: {
     type: "object",
     properties: {
       withDeps: {
         type: "boolean",
         description: "Install system dependencies required by Chromium browser. Default is false",
-        default: false
+        default: false,
       },
       force: {
         type: "boolean",
         description: "Force installation even if Chromium is already installed. Default is false",
-        default: false
-      }
+        default: false,
+      },
     },
-    required: []
-  }
+    required: [],
+  },
 };
 
 /**
@@ -66,9 +67,9 @@ export async function browserInstall(args: any) {
         content: [
           {
             type: "text",
-            text: `✅ ${successMessage}\n\n${result.output}`
-          }
-        ]
+            text: `✅ ${successMessage}\n\n${result.output}`,
+          },
+        ],
       };
     } else {
       const errorMessage = `Failed to install Chromium browser: ${result.error}`;
@@ -78,9 +79,9 @@ export async function browserInstall(args: any) {
         content: [
           {
             type: "text",
-            text: `❌ ${errorMessage}\n\nOutput:\n${result.output}\n\nError:\n${result.error}`
-          }
-        ]
+            text: `❌ ${errorMessage}\n\nOutput:\n${result.output}\n\nError:\n${result.error}`,
+          },
+        ],
       };
     }
   } catch (error: any) {
@@ -91,9 +92,9 @@ export async function browserInstall(args: any) {
       content: [
         {
           type: "text",
-          text: `❌ ${errorMessage}\n\nPlease check your internet connection and try again. You may also need to run with elevated privileges.`
-        }
-      ]
+          text: `❌ ${errorMessage}\n\nPlease check your internet connection and try again. You may also need to run with elevated privileges.`,
+        },
+      ],
     };
   }
 }
@@ -103,7 +104,9 @@ export async function browserInstall(args: any) {
  * 1. Try to use local playwright CLI (ensures version consistency)
  * 2. Fallback to npx if local CLI not found (ensures availability)
  */
-function executePlaywrightInstall(args: string[]): Promise<{success: boolean, output: string, error: string}> {
+function executePlaywrightInstall(
+  args: string[],
+): Promise<{ success: boolean; output: string; error: string }> {
   return new Promise((resolve) => {
     let command: string;
     let commandArgs: string[];
@@ -118,12 +121,12 @@ function executePlaywrightInstall(args: string[]): Promise<{success: boolean, ou
       // Verify CLI file exists
       if (existsSync(playwrightCliPath)) {
         // Remove 'playwright' from args as we're directly calling the CLI
-        const filteredArgs = args.filter(arg => arg !== "playwright");
-        
+        const filteredArgs = args.filter((arg) => arg !== "playwright");
+
         command = "node";
         commandArgs = [playwrightCliPath, ...filteredArgs];
         strategyUsed = "local CLI";
-        
+
         logger.info(`[BrowserInstall] Using local Playwright CLI: ${playwrightCliPath}`);
         logger.debug(`[BrowserInstall] Command: node ${commandArgs.join(" ")}`);
       } else {
@@ -134,14 +137,14 @@ function executePlaywrightInstall(args: string[]): Promise<{success: boolean, ou
       command = "npx";
       commandArgs = args;
       strategyUsed = "npx fallback";
-      
+
       logger.warn(`[BrowserInstall] Local CLI not found, falling back to npx: ${error.message}`);
       logger.debug(`[BrowserInstall] Command: npx ${commandArgs.join(" ")}`);
     }
 
     const child = spawn(command, commandArgs, {
       stdio: "pipe",
-      shell: process.platform === "win32"
+      shell: process.platform === "win32",
     });
 
     let stdout = "";
@@ -166,7 +169,7 @@ function executePlaywrightInstall(args: string[]): Promise<{success: boolean, ou
       resolve({
         success,
         output: stdout,
-        error: stderr
+        error: stderr,
       });
     });
 
@@ -175,7 +178,7 @@ function executePlaywrightInstall(args: string[]): Promise<{success: boolean, ou
       resolve({
         success: false,
         output: stdout,
-        error: error.message
+        error: error.message,
       });
     });
   });

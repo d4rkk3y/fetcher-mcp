@@ -1,5 +1,5 @@
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { Response, Request } from "express";
+import type { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import type { Request, Response } from "express";
 
 /**
  * Transport configuration interface

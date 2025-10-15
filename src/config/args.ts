@@ -1,4 +1,4 @@
-import { TransportConfig } from "../transports/types.js";
+import type { TransportConfig } from "../transports/types.js";
 
 /**
  * Parse command line arguments
@@ -25,7 +25,7 @@ export function parseTransportConfig(): TransportConfig {
     const portArg = args.find((arg) => arg.startsWith("--port="));
     if (portArg) {
       const portValue = parseInt(portArg.split("=")[1], 10);
-      if (!isNaN(portValue)) {
+      if (!Number.isNaN(portValue)) {
         config.port = portValue;
       }
     }

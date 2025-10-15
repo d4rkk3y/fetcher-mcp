@@ -1,7 +1,7 @@
-import { Browser, Page } from "patchright";
-import { WebContentProcessor } from "../services/webContentProcessor.js";
+import type { Browser } from "patchright";
 import { BrowserService } from "../services/browserService.js";
-import { FetchOptions, FetchResult } from "../types/index.js";
+import { WebContentProcessor } from "../services/webContentProcessor.js";
+import type { FetchOptions, FetchResult } from "../types/index.js";
 import { logger } from "../utils/logger.js";
 
 /**
@@ -22,8 +22,7 @@ export const fetchUrlsTool = {
       },
       timeout: {
         type: "number",
-        description:
-          "Page loading timeout in milliseconds, default is 30000 (30 seconds)",
+        description: "Page loading timeout in milliseconds, default is 30000 (30 seconds)",
       },
       waitUntil: {
         type: "string",
@@ -32,18 +31,15 @@ export const fetchUrlsTool = {
       },
       extractContent: {
         type: "boolean",
-        description:
-          "Whether to intelligently extract the main content, default is true",
+        description: "Whether to intelligently extract the main content, default is true",
       },
       maxLength: {
         type: "number",
-        description:
-          "Maximum length of returned content (in characters), default is no limit",
+        description: "Maximum length of returned content (in characters), default is no limit",
       },
       returnHtml: {
         type: "boolean",
-        description:
-          "Whether to return HTML content instead of Markdown, default is false",
+        description: "Whether to return HTML content instead of Markdown, default is false",
       },
       waitForNavigation: {
         type: "boolean",
@@ -106,7 +102,7 @@ export async function fetchUrls(args: any) {
   try {
     // Create a stealth browser with anti-detection measures
     browser = await browserService.createBrowser();
-    
+
     // Create a stealth browser context
     const { context, viewport } = await browserService.createContext(browser);
 
@@ -116,28 +112,23 @@ export async function fetchUrls(args: any) {
       urls.map(async (url, index) => {
         // Create a new page with human-like behavior
         const page = await browserService.createPage(context, viewport);
-        
+
         try {
           const result = await processor.processPageContent(page, url);
           return { index, ...result } as FetchResult;
         } finally {
           if (!browserService.isInDebugMode()) {
-            await page
-              .close()
-              .catch((e) => logger.error(`Failed to close page: ${e.message}`));
+            await page.close().catch((e) => logger.error(`Failed to close page: ${e.message}`));
           } else {
             logger.debug(`Page kept open for debugging. URL: ${url}`);
           }
         }
-      })
+      }),
     );
 
     results.sort((a, b) => (a.index || 0) - (b.index || 0));
     const combinedResults = results
-      .map(
-        (result, i) =>
-          `[webpage ${i + 1} begin]\n${result.content}\n[webpage ${i + 1} end]`
-      )
+      .map((result, i) => `[webpage ${i + 1} begin]\n${result.content}\n[webpage ${i + 1} end]`)
       .join("\n\n");
 
     return {
@@ -147,9 +138,7 @@ export async function fetchUrls(args: any) {
     // Clean up browser resources
     if (!browserService.isInDebugMode()) {
       if (browser)
-        await browser
-          .close()
-          .catch((e) => logger.error(`Failed to close browser: ${e.message}`));
+        await browser.close().catch((e) => logger.error(`Failed to close browser: ${e.message}`));
     } else {
       logger.debug(`Browser kept open for debugging. URLs: ${urls.join(", ")}`);
     }

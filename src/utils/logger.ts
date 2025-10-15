@@ -7,7 +7,7 @@ class Logger {
 
   private log(level: string, message: string) {
     if (!this.logMode) return;
-    
+
     const timestamp = new Date().toISOString();
     const logMessage = `${timestamp} [${level}] ${message}`;
     console.error(logMessage);

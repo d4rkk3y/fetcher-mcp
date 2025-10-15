@@ -1,6 +1,6 @@
-import { Browser, BrowserContext, Page, chromium } from "patchright";
+import { type Browser, type BrowserContext, chromium, type Page } from "patchright";
+import type { FetchOptions } from "../types/index.js";
 import { logger } from "../utils/logger.js";
-import { FetchOptions } from "../types/index.js";
 
 /**
  * Service for managing browser instances with anti-detection features
@@ -12,7 +12,7 @@ export class BrowserService {
   constructor(options: FetchOptions) {
     this.options = options;
     this.isDebugMode = process.argv.includes("--debug");
-    
+
     // Debug mode from options takes precedence over command line flag
     if (options.debug !== undefined) {
       this.isDebugMode = options.debug;
@@ -49,7 +49,7 @@ export class BrowserService {
   /**
    * Generate a random viewport size
    */
-  private getRandomViewport(): {width: number, height: number} {
+  private getRandomViewport(): { width: number; height: number } {
     const viewports = [
       { width: 1920, height: 1080 },
       { width: 1366, height: 768 },
@@ -66,43 +66,43 @@ export class BrowserService {
   private async setupAntiDetection(context: BrowserContext): Promise<void> {
     await context.addInitScript(() => {
       // Override navigator.webdriver
-      Object.defineProperty(navigator, 'webdriver', {
+      Object.defineProperty(navigator, "webdriver", {
         get: () => false,
       });
-      
+
       // Remove automation fingerprints
       delete (window as any).cdc_adoQpoasnfa76pfcZLmcfl_Array;
       delete (window as any).cdc_adoQpoasnfa76pfcZLmcfl_Promise;
       delete (window as any).cdc_adoQpoasnfa76pfcZLmcfl_Symbol;
-      
+
       // Add Chrome object for fingerprinting evasion
       const chrome = {
         runtime: {},
       };
-      
+
       // Add fingerprint characteristics
       (window as any).chrome = chrome;
-      
+
       // Modify screen and navigator properties
-      Object.defineProperty(screen, 'width', { value: window.innerWidth });
-      Object.defineProperty(screen, 'height', { value: window.innerHeight });
-      Object.defineProperty(screen, 'availWidth', { value: window.innerWidth });
-      Object.defineProperty(screen, 'availHeight', { value: window.innerHeight });
-      
+      Object.defineProperty(screen, "width", { value: window.innerWidth });
+      Object.defineProperty(screen, "height", { value: window.innerHeight });
+      Object.defineProperty(screen, "availWidth", { value: window.innerWidth });
+      Object.defineProperty(screen, "availHeight", { value: window.innerHeight });
+
       // Add language features
-      Object.defineProperty(navigator, 'languages', {
-        get: () => ['en-US', 'en'],
+      Object.defineProperty(navigator, "languages", {
+        get: () => ["en-US", "en"],
       });
-      
+
       // Simulate random number of plugins
-      Object.defineProperty(navigator, 'plugins', {
+      Object.defineProperty(navigator, "plugins", {
         get: () => {
           const plugins = [];
           for (let i = 0; i < 5 + Math.floor(Math.random() * 5); i++) {
             plugins.push({
-              name: 'Plugin ' + i,
-              description: 'Description ' + i,
-              filename: 'plugin' + i + '.dll',
+              name: `Plugin ${i}`,
+              description: `Description ${i}`,
+              filename: `plugin${i}.dll`,
             });
           }
           return plugins;
@@ -137,25 +137,25 @@ export class BrowserService {
       return await chromium.launch({
         headless: !this.isDebugMode,
         args: [
-          '--disable-blink-features=AutomationControlled',
-          '--disable-features=IsolateOrigins,site-per-process',
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-webgl',
-          '--disable-infobars',
-          '--window-size=' + viewport.width + ',' + viewport.height,
-          '--disable-extensions'
-        ]
+          "--disable-blink-features=AutomationControlled",
+          "--disable-features=IsolateOrigins,site-per-process",
+          "--no-sandbox",
+          "--disable-setuid-sandbox",
+          "--disable-dev-shm-usage",
+          "--disable-webgl",
+          "--disable-infobars",
+          `--window-size=${viewport.width},${viewport.height}`,
+          "--disable-extensions",
+        ],
       });
     } catch (error: any) {
       // Check if the error is related to missing browser installation
       if (this.isBrowserNotInstalledError(error)) {
         const enhancedError = new Error(
           `Browser not installed. ${error.message}\n\n` +
-          `💡 To fix this issue, please call the 'browser_install' tool to install the required browser binaries.`
+            `💡 To fix this issue, please call the 'browser_install' tool to install the required browser binaries.`,
         );
-        enhancedError.name = 'BrowserNotInstalledError';
+        enhancedError.name = "BrowserNotInstalledError";
         throw enhancedError;
       }
       throw error;
@@ -166,22 +166,26 @@ export class BrowserService {
    * Check if error is related to browser not being installed
    */
   private isBrowserNotInstalledError(error: any): boolean {
-    const errorMessage = error.message?.toLowerCase() || '';
+    const errorMessage = error.message?.toLowerCase() || "";
 
-    return errorMessage.includes('executable doesn\'t exist') ||
-           errorMessage.includes('browser not found') ||
-           errorMessage.includes('could not find browser') ||
-           errorMessage.includes('failed to launch browser') ||
-           errorMessage.includes('browser executable not found') ||
-           errorMessage.includes('chromium browser not found');
+    return (
+      errorMessage.includes("executable doesn't exist") ||
+      errorMessage.includes("browser not found") ||
+      errorMessage.includes("could not find browser") ||
+      errorMessage.includes("failed to launch browser") ||
+      errorMessage.includes("browser executable not found") ||
+      errorMessage.includes("chromium browser not found")
+    );
   }
 
   /**
    * Create a new browser context with stealth configurations
    */
-  public async createContext(browser: Browser): Promise<{ context: BrowserContext, viewport: {width: number, height: number} }> {
+  public async createContext(
+    browser: Browser,
+  ): Promise<{ context: BrowserContext; viewport: { width: number; height: number } }> {
     const viewport = this.getRandomViewport();
-    
+
     const context = await browser.newContext({
       javaScriptEnabled: true,
       ignoreHTTPSErrors: true,
@@ -190,38 +194,42 @@ export class BrowserService {
       deviceScaleFactor: Math.random() > 0.5 ? 1 : 2,
       isMobile: false,
       hasTouch: false,
-      locale: 'en-US',
-      timezoneId: 'America/New_York',
-      colorScheme: 'light',
+      locale: "en-US",
+      timezoneId: "America/New_York",
+      colorScheme: "light",
       acceptDownloads: true,
       extraHTTPHeaders: {
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'DNT': '1',
-        'Connection': 'keep-alive',
-        'Upgrade-Insecure-Requests': '1',
-        'Sec-Fetch-Dest': 'document',
-        'Sec-Fetch-Mode': 'navigate',
-        'Sec-Fetch-Site': 'none',
-        'Sec-Fetch-User': '?1',
-        'Cache-Control': 'max-age=0',
-      }
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Accept-Encoding": "gzip, deflate, br",
+        DNT: "1",
+        Connection: "keep-alive",
+        "Upgrade-Insecure-Requests": "1",
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "none",
+        "Sec-Fetch-User": "?1",
+        "Cache-Control": "max-age=0",
+      },
     });
 
     // Set up anti-detection measures
     await this.setupAntiDetection(context);
-    
+
     // Configure media handling
     await this.setupMediaHandling(context);
-    
+
     return { context, viewport };
   }
 
   /**
    * Create a new page
    */
-  public async createPage(context: BrowserContext, viewport: {width: number, height: number}): Promise<Page> {
+  public async createPage(
+    context: BrowserContext,
+    _viewport: { width: number; height: number },
+  ): Promise<Page> {
     const page = await context.newPage();
     return page;
   }
@@ -232,14 +240,10 @@ export class BrowserService {
   public async cleanup(browser: Browser | null, page: Page | null): Promise<void> {
     if (!this.isDebugMode) {
       if (page) {
-        await page
-          .close()
-          .catch((e) => logger.error(`Failed to close page: ${e.message}`));
+        await page.close().catch((e) => logger.error(`Failed to close page: ${e.message}`));
       }
       if (browser) {
-        await browser
-          .close()
-          .catch((e) => logger.error(`Failed to close browser: ${e.message}`));
+        await browser.close().catch((e) => logger.error(`Failed to close browser: ${e.message}`));
       }
     }
   }

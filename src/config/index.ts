@@ -1,5 +1,5 @@
-import { parseTransportConfig, isDebugMode } from "./args.js";
-import { TransportConfig } from "../transports/types.js";
+import type { TransportConfig } from "../transports/types.js";
+import { isDebugMode, parseTransportConfig } from "./args.js";
 
 /**
  * Get application configuration

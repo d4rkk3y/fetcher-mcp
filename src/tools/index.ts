@@ -1,17 +1,13 @@
-import { fetchUrlTool, fetchUrl } from './fetchUrl.js';
-import { fetchUrlsTool, fetchUrls } from './fetchUrls.js';
-import { browserInstallTool, browserInstall } from './browserInstall.js';
+import { browserInstall, browserInstallTool } from "./browserInstall.js";
+import { fetchUrl, fetchUrlTool } from "./fetchUrl.js";
+import { fetchUrls, fetchUrlsTool } from "./fetchUrls.js";
 
 // Export tool definitions
-export const tools = [
-  fetchUrlTool,
-  fetchUrlsTool,
-  browserInstallTool
-];
+export const tools = [fetchUrlTool, fetchUrlsTool, browserInstallTool];
 
 // Export tool implementations
 export const toolHandlers = {
   [fetchUrlTool.name]: fetchUrl,
   [fetchUrlsTool.name]: fetchUrls,
-  [browserInstallTool.name]: browserInstall
+  [browserInstallTool.name]: browserInstall,
 };

@@ -1,10 +1,10 @@
-import express, { Request, Response } from "express";
 import { randomUUID } from "node:crypto";
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import type { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
-import { TransportProvider } from "./types.js";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import express, { type Request, type Response } from "express";
 import { logger } from "../utils/logger.js";
+import type { TransportProvider } from "./types.js";
 
 /**
  * Check if a request is an initialization request
@@ -30,7 +30,10 @@ export class HttpTransportProvider implements TransportProvider {
    * @param host Host address
    * @param port Port number
    */
-  constructor(private host: string = "localhost", private port: number = 3000) {
+  constructor(
+    private host: string = "localhost",
+    private port: number = 3000,
+  ) {
     this.app = express();
     this.app.use(express.json());
 
@@ -46,7 +49,7 @@ export class HttpTransportProvider implements TransportProvider {
    */
   async connect(server: Server): Promise<void> {
     logger.info(
-      `[Transport] Connecting server using HTTP transport, listening on ${this.host}:${this.port}`
+      `[Transport] Connecting server using HTTP transport, listening on ${this.host}:${this.port}`,
     );
 
     // Initialize Express routes
@@ -55,9 +58,7 @@ export class HttpTransportProvider implements TransportProvider {
     // Start HTTP server
     return new Promise((resolve) => {
       this.server = this.app.listen(this.port, this.host, () => {
-        logger.info(
-          `[Transport] HTTP server started, access at http://${this.host}:${this.port}`
-        );
+        logger.info(`[Transport] HTTP server started, access at http://${this.host}:${this.port}`);
         resolve();
       });
     });
@@ -72,9 +73,7 @@ export class HttpTransportProvider implements TransportProvider {
       try {
         transport.close();
       } catch (err) {
-        logger.error(
-          `[Transport] Failed to close Streamable HTTP transport: ${err}`
-        );
+        logger.error(`[Transport] Failed to close Streamable HTTP transport: ${err}`);
       }
     });
 
@@ -159,7 +158,7 @@ export class HttpTransportProvider implements TransportProvider {
   private async handleStreamableHttpRequest(
     server: Server,
     req: Request,
-    res: Response
+    res: Response,
   ): Promise<void> {
     // Check for existing session ID
     const sessionId = req.headers["mcp-session-id"] as string | undefined;
@@ -176,9 +175,7 @@ export class HttpTransportProvider implements TransportProvider {
         transport = new StreamableHTTPServerTransport({
           sessionIdGenerator: () => randomUUID(),
           onsessioninitialized: (sessionId: string) => {
-            logger.debug(
-              `[Transport] StreamableHTTP session initialized: ${sessionId}`
-            );
+            logger.debug(`[Transport] StreamableHTTP session initialized: ${sessionId}`);
             this.transports.streamable[sessionId] = transport;
           },
         });
@@ -186,9 +183,7 @@ export class HttpTransportProvider implements TransportProvider {
         // Clean up transport
         transport.onclose = () => {
           if (transport.sessionId) {
-            logger.debug(
-              `[Transport] Closing StreamableHTTP session: ${transport.sessionId}`
-            );
+            logger.debug(`[Transport] Closing StreamableHTTP session: ${transport.sessionId}`);
             delete this.transports.streamable[transport.sessionId];
           }
         };
@@ -198,7 +193,7 @@ export class HttpTransportProvider implements TransportProvider {
       } else {
         // Invalid request
         logger.error(
-          "[Transport] Invalid request: No session ID and not an initialization request"
+          "[Transport] Invalid request: No session ID and not an initialization request",
         );
         res.status(400).json({
           jsonrpc: "2.0",
@@ -214,9 +209,7 @@ export class HttpTransportProvider implements TransportProvider {
       // Handle request
       await transport.handleRequest(req, res, req.body);
     } catch (error: any) {
-      logger.error(
-        `[Transport] Error handling StreamableHTTP request: ${error.message}`
-      );
+      logger.error(`[Transport] Error handling StreamableHTTP request: ${error.message}`);
       if (!res.headersSent) {
         res.status(500).json({
           jsonrpc: "2.0",
@@ -233,10 +226,7 @@ export class HttpTransportProvider implements TransportProvider {
   /**
    * Handle session requests (GET/DELETE)
    */
-  private async handleSessionRequest(
-    req: Request,
-    res: Response
-  ): Promise<void> {
+  private async handleSessionRequest(req: Request, res: Response): Promise<void> {
     const sessionId = req.headers["mcp-session-id"] as string | undefined;
     if (!sessionId || !this.transports.streamable[sessionId]) {
       logger.error(`[Transport] Invalid or missing session ID: ${sessionId}`);
@@ -248,9 +238,7 @@ export class HttpTransportProvider implements TransportProvider {
       const transport = this.transports.streamable[sessionId];
       await transport.handleRequest(req, res);
     } catch (error: any) {
-      logger.error(
-        `[Transport] Error handling session request: ${error.message}`
-      );
+      logger.error(`[Transport] Error handling session request: ${error.message}`);
       if (!res.headersSent) {
         res.status(500).send(`Internal server error: ${error.message}`);
       }
@@ -260,11 +248,7 @@ export class HttpTransportProvider implements TransportProvider {
   /**
    * Handle SSE requests (legacy clients)
    */
-  private async handleSseRequest(
-    server: Server,
-    req: Request,
-    res: Response
-  ): Promise<void> {
+  private async handleSseRequest(server: Server, _req: Request, res: Response): Promise<void> {
     try {
       logger.debug("[Transport] Initializing SSE transport");
       const transport = new SSEServerTransport("/messages", res);
@@ -287,10 +271,7 @@ export class HttpTransportProvider implements TransportProvider {
   /**
    * Handle SSE message requests (legacy clients)
    */
-  private async handleSseMessageRequest(
-    req: Request,
-    res: Response
-  ): Promise<void> {
+  private async handleSseMessageRequest(req: Request, res: Response): Promise<void> {
     const sessionId = req.query.sessionId as string;
     const transport = sessionId ? this.transports.sse[sessionId] : undefined;
 
@@ -298,17 +279,13 @@ export class HttpTransportProvider implements TransportProvider {
       try {
         await transport.handlePostMessage(req, res, req.body);
       } catch (error: any) {
-        logger.error(
-          `[Transport] Error handling SSE message request: ${error.message}`
-        );
+        logger.error(`[Transport] Error handling SSE message request: ${error.message}`);
         if (!res.headersSent) {
           res.status(500).send(`Internal server error: ${error.message}`);
         }
       }
     } else {
-      logger.error(
-        `[Transport] No transport found for session ID: ${sessionId}`
-      );
+      logger.error(`[Transport] No transport found for session ID: ${sessionId}`);
       res.status(400).send("No transport found for session ID");
     }
   }

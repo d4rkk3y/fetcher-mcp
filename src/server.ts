@@ -1,10 +1,7 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from "@modelcontextprotocol/sdk/types.js";
-import { tools, toolHandlers } from "./tools/index.js";
-import { TransportProvider } from "./transports/types.js";
+import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import { toolHandlers, tools } from "./tools/index.js";
+import type { TransportProvider } from "./transports/types.js";
 import { logger } from "./utils/logger.js";
 
 /**
@@ -21,7 +18,7 @@ function createServer() {
       capabilities: {
         tools: {},
       },
-    }
+    },
   );
 
   server.setRequestHandler(ListToolsRequestSchema, async () => {
@@ -63,9 +60,7 @@ function setupProcessHandlers(transportProvider: TransportProvider): void {
 
   // Handle SIGTERM signal
   process.on("SIGTERM", async () => {
-    logger.info(
-      "[Server] Received SIGTERM signal, gracefully shutting down..."
-    );
+    logger.info("[Server] Received SIGTERM signal, gracefully shutting down...");
     await transportProvider.close();
     process.exit(0);
   });
@@ -85,9 +80,7 @@ function setupProcessHandlers(transportProvider: TransportProvider): void {
  * Start MCP server using the specified transport provider
  * @param transportProvider Transport provider
  */
-export async function startServer(
-  transportProvider: TransportProvider
-): Promise<void> {
+export async function startServer(transportProvider: TransportProvider): Promise<void> {
   try {
     const server = createServer();
     logger.info("[Server] Starting MCP server...");
