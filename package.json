@@ -1,6 +1,6 @@
 {
   "name": "fetcher-mcp",
-  "version": "0.3.0",
+  "version": "0.3.5",
   "description": "MCP server for fetching web content using Playwright browser",
   "private": false,
   "type": "module",
@@ -12,10 +12,11 @@
     "icon.svg"
   ],
   "scripts": {
-    "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
+    "build": "rm -rf build && tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
     "watch": "tsc --watch",
     "inspector": "npm run build && npx @modelcontextprotocol/inspector build/index.js --debug",
-    "install-browser": "npx playwright install chromium"
+    "install-browser": "npx playwright install chromium",
+    "postinstall": "playwright install chromium"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.11.0",
