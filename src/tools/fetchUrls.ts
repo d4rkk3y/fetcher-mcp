@@ -18,11 +18,11 @@ export const fetchUrlsTool = {
         items: {
           type: "string",
         },
-        description: "Array of URLs to fetch",
+        description: "Array of URLs to fetch (maximum 5 urls)",
       },
       timeout: {
         type: "number",
-        description: "Page loading timeout in milliseconds, default is 30000 (30 seconds)",
+        description: "Page loading timeout in milliseconds, default is 60000 (60 seconds)",
       },
       waitUntil: {
         type: "string",
@@ -76,7 +76,7 @@ export async function fetchUrls(args: any) {
   }
 
   const options: FetchOptions = {
-    timeout: Number(args?.timeout) || 30000,
+    timeout: Number(args?.timeout) || 60000,
     waitUntil: String(args?.waitUntil || "load") as
       | "load"
       | "domcontentloaded"
